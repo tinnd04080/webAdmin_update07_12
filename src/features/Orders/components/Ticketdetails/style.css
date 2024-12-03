@@ -1,0 +1,53 @@
+/* Định nghĩa font cho Modal */
+.modal-wrapper {
+  font-family: Arial, sans-serif;
+}
+
+/* Định dạng các nhóm thông tin */
+.info-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Định dạng tiêu đề thông tin */
+.info-title {
+  font-weight: 600;
+  color: #555;
+  font-size: 16px;
+}
+
+/* Định dạng nội dung thông tin */
+.info-content {
+  margin: 4px 0;
+  margin-left: 5px;
+  color: #000;
+  font-size: 16px;
+  font-weight: 500;
+  word-wrap: break-word;
+}
+
+/* Định dạng Footer Modal */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+/* Định dạng tiêu đề của Modal */
+.modal-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+  color: #000;
+  margin-bottom: 5px;
+}
+
+/* Định dạng liên kết xem chi tiết */
+.view-detail-link {
+  color: #d91656;
+  font-weight: 600;
+  cursor: pointer;
+}

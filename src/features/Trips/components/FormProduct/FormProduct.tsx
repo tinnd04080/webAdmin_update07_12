@@ -72,8 +72,10 @@ const FormProduct = () => {
         dispatch(setOpenDrawer(false))
         dispatch(setProductId(null))
         form.resetFields() // Reset form sau khi gửi thành công
-      } catch (error) {
-        message.error('Có lỗi xảy ra, vui lòng thử lại sau!')
+      } catch (error: any) {
+        // Lấy thông báo lỗi từ backend
+        const errorMessage = error.data?.message || 'Có lỗi xảy ra, vui lòng thử lại sau!'
+        message.error(errorMessage)
       }
       return
     }
@@ -87,8 +89,10 @@ const FormProduct = () => {
       dispatch(setOpenDrawer(false))
       dispatch(setProductId(null))
       form.resetFields() // Reset form sau khi gửi thành công
-    } catch (error) {
-      message.error('Có lỗi xảy ra, vui lòng thử lại sau!')
+    } catch (error: any) {
+      // Lấy thông báo lỗi từ backend
+      const errorMessage = error.data?.message || 'Có lỗi xảy ra, vui lòng thử lại sau!'
+      message.error(errorMessage)
     }
   }
   useEffect(() => {
@@ -149,12 +153,12 @@ const FormProduct = () => {
       <Form layout='vertical' autoComplete='off' form={form} onFinish={handleSubmitForm}>
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item
+            {/* <Form.Item
               name='bus'
               label='Xe'
               rules={[{ required: productEdit ? false : true, message: 'Xe là bắt buộc' }]}
-            >
-              {/* <Select placeholder='Chọn Xe' size='large' allowClear>
+            > */}
+            {/* <Select placeholder='Chọn Xe' size='large' allowClear>
                 {dataProducts?.data?.map((size) => (
                   <Option value={size._id} key={size._id}>
                     <span className='text-sm capitalize'>
@@ -163,13 +167,32 @@ const FormProduct = () => {
                   </Option>
                 ))}
               </Select> */}
-              <Select placeholder='Chọn Xe' size='large' allowClear>
+            {/*  <Select placeholder='Chọn Xe' size='large' allowClear>
                 {dataProducts?.data
                   ?.filter((size) => size.status === 'OPEN') // Lọc ra những xe có trạng thái OPEN
                   .map((size) => (
                     <Option value={size._id} key={size._id}>
                       <span className='text-sm capitalize'>
                         <span className='capitalize'>{size.licensePlate}</span>
+                      </span>
+                    </Option>
+                  ))}
+              </Select> */}
+            {/* </Form.Item> */}
+            <Form.Item
+              name='bus'
+              label='Xe'
+              rules={[{ required: productEdit ? false : true, message: 'Xe là bắt buộc' }]}
+            >
+              <Select placeholder='Chọn Xe' size='large' allowClear>
+                {dataProducts?.data
+                  ?.filter((bus) => bus.status === 'OPEN') // Lọc các xe có trạng thái OPEN
+                  .map((bus) => (
+                    <Option value={bus._id} key={bus._id}>
+                      <span className='text-sm capitalize'>
+                        <span className='capitalize'>{bus.licensePlate}</span> - {/* Biển số xe */}
+                        <span>Xe {bus.busTypeName}</span> - {/* Tên xe */}
+                        <span>{bus.seatCapacity} ghế</span> {/* Số lượng ghế */}
                       </span>
                     </Option>
                   ))}

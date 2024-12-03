@@ -17,7 +17,12 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@ant-design/icons": "^5.2.6",
+    "@ant-design/icons": "^5.5.2",
+    "@ant-design/plots": "^2.3.2",
+    "@fortawesome/fontawesome-svg-core": "^6.7.1",
+    "@fortawesome/free-brands-svg-icons": "^6.7.1",
+    "@fortawesome/free-solid-svg-icons": "^6.7.1",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@hookform/resolvers": "^3.3.1",
     "@react-pdf/renderer": "^3.1.14",
     "@reduxjs/toolkit": "^1.9.6",
@@ -53,6 +58,7 @@
     "redux-persist": "^6.0.0",
     "sheetjs-style": "^0.15.8",
     "socket.io-client": "^4.7.2",
+    "styled-components": "^6.1.13",
     "sweetalert2": "^11.7.31",
     "tailwind-merge": "^1.14.0",
     "tailwind-scrollbar-hide": "^1.1.7",

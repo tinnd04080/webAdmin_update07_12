@@ -8,11 +8,6 @@ import { setOpenDrawer } from '~/store/slices'
 import VoucherAdd from './component/FormVoucher/FormVoucher'
 import { items } from './data'
 
-// interface VoucherFeatureProps {
-//   data: IVoucher[]
-// }
-
-// const VoucherFeature = ({ data }: VoucherFeatureProps) => {
 const VoucherFeature = () => {
   const dispatch = useAppDispatch()
   const { openDrawer } = useAppSelector((state) => state.drawer)
@@ -22,14 +17,12 @@ const VoucherFeature = () => {
   return (
     <div>
       <Breadcrumb pageName='Mã giảm giá'>
-        {/* {user && user.role === IRoleUser.ADMIN && (
+        {/* Chỉ hiển thị nút "Thêm" khi người dùng có role là ADMIN */}
+        {user && user.role === 'ADMIN' && (
           <Button icon={<PlusIcon />} onClick={() => dispatch(setOpenDrawer(true))}>
             Thêm
           </Button>
-        )} */}
-        <Button icon={<PlusIcon />} onClick={() => dispatch(setOpenDrawer(true))}>
-          Thêm
-        </Button>
+        )}
       </Breadcrumb>
       <Tabs defaultActiveKey='1' items={items}></Tabs>
       <VoucherAdd open={openDrawer} />

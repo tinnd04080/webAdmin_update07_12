@@ -175,7 +175,7 @@ export const FormCustomer = ({ open }: FormCustomerProps) => {
             className='dark:text-white'
             onFinish={onFinish}
           >
-            <Form.Item
+            {/*  <Form.Item
               className='dark:text-white'
               label='UserName'
               name='userName'
@@ -196,19 +196,19 @@ export const FormCustomer = ({ open }: FormCustomerProps) => {
               ]}
             >
               <Input size='large' placeholder='UserName' />
-            </Form.Item>
+            </Form.Item> */}
 
             {/* {!userData._id && ( */}
             <Form.Item
               className='dark:text-white'
-              label='email'
+              label='Email'
               name='email'
               rules={[
                 { required: true, message: 'Không được bỏ trống tài khoản!' },
                 { type: 'email', message: 'Email sai định dạng' }
               ]}
             >
-              <Input type='email' size='large' placeholder='email' />
+              <Input type='email' size='large' placeholder='Nhập Email' />
             </Form.Item>
             {/* )} */}
             <Form.Item
@@ -236,7 +236,7 @@ export const FormCustomer = ({ open }: FormCustomerProps) => {
                 }
               ]}
             >
-              <Input type='text' size='large' placeholder='phoneNumber' />
+              <Input type='text' size='large' placeholder='Nhập số điện thoại' />
             </Form.Item>
             <Form.Item
               className='dark:text-white'
@@ -255,7 +255,7 @@ export const FormCustomer = ({ open }: FormCustomerProps) => {
                 }
               ]}
             >
-              <Input type='text' size='large' placeholder='fullName' />
+              <Input type='text' size='large' placeholder='Nhập họ và tên' />
             </Form.Item>
             <Form.Item
               className='dark:text-white'
@@ -279,7 +279,7 @@ export const FormCustomer = ({ open }: FormCustomerProps) => {
                 }
               ]}
             >
-              <Input type='text' size='large' placeholder='cccd' />
+              <Input type='text' size='large' placeholder='Nhập số căn cước công dân' />
             </Form.Item>
             <Form.Item
               className='dark:text-white'
@@ -317,7 +317,7 @@ export const FormCustomer = ({ open }: FormCustomerProps) => {
                   }
                 ]}
               >
-                <Input.Password placeholder='Mật khẩu' size='large' />
+                <Input.Password placeholder='Nhập mật khẩu' size='large' />
               </Form.Item>
             )}
 

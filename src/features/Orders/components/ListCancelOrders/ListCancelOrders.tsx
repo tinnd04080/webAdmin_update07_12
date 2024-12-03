@@ -1,8 +1,8 @@
-import { Button as ButtonAnt, Input, Space, Table, Tooltip } from 'antd'
+import { Button as ButtonAnt, Input, Space, Table, Tooltip, Form, Select } from 'antd'
 import { EyeFilled, SearchOutlined } from '@ant-design/icons'
 import { RootState, useAppDispatch } from '~/store/store'
 import { useEffect, useMemo, useRef, useState } from 'react'
-
+import { messageAlert } from '~/utils/messageAlert'
 import { ColumnType } from 'antd/lib/table'
 import { ColumnsType } from 'antd/es/table'
 import type { FilterConfirmProps } from 'antd/es/table/interface'
@@ -18,8 +18,8 @@ import { formatDate } from '~/utils/formatDate'
 import { setOpenDrawer } from '~/store/slices'
 import { setOrderData } from '~/store/slices/Orders/order.slice'
 import { useAppSelector } from '~/store/hooks'
-import { useGetAllOrderCancelQuery, useGetAllOrderPendingQuery } from '~/store/services/Orders'
-
+import { useGetAllOrderCancelQuery, useGetAllOrderPendingQuery, useConfirmOrderMutation } from '~/store/services/Orders'
+import TicketDetails from '../Ticketdetails/ticketDetails.tsx'
 type DataIndex = keyof IOrderDataType
 const ListCancelOrders = () => {
   const dispatch = useAppDispatch()
@@ -50,7 +50,18 @@ const ListCancelOrders = () => {
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
-
+  const [confirmOrder, { isLoading: isComfirming }] = useConfirmOrderMutation()
+  const onConfirmOrder = ({ idOrder, idUser }: { idOrder: string; idUser: string }) => {
+    confirmOrder({
+      idOrder,
+      idUser
+    })
+      .unwrap()
+      .then(() => {
+        messageAlert('Thay đổi trạng thái thành công', 'success', 4)
+      })
+      .catch(() => messageAlert('Thay đổi trạng thái thất bại', 'error'))
+  }
   const handleSearch = (
     selectedKeys: string[],
     confirm: (param?: FilterConfirmProps) => void,
@@ -131,16 +142,17 @@ const ListCancelOrders = () => {
   /*End Search */
 
   const columns: ColumnsType<any> = [
+    // {
+    //   title: '#',
+    //   dataIndex: 'index',
+    //   width: 40,
+    //   defaultSortOrder: 'ascend',
+    //   sorter: (a, b) => a.index - b.index
+    // },
     {
-      title: '#',
-      dataIndex: 'index',
-      width: 50,
-      defaultSortOrder: 'ascend',
-      sorter: (a, b) => a.index - b.index
-    },
-    {
-      title: 'ID',
-      dataIndex: 'orderCode',
+      title: 'Mã vé',
+      dataIndex: 'code',
+      key: 'code',
       width: 100,
       ...getColumnSearchProps('orderCode')
     },
@@ -148,29 +160,53 @@ const ListCancelOrders = () => {
       title: 'Thông tin người đặt',
       dataIndex: 'user',
       key: 'user',
-      width: 200,
-      // rowScope: 'row',
+      width: 150,
+      rowScope: 'row',
+      ...getColumnSearchProps('user'),
       // sorter: (a, b) => {
       //   return a.user.username.localeCompare(b.user.username)
       // },
-      ...getColumnSearchProps('user'),
+      // sortDirections: ['descend', 'ascend'],
       render: (user: any) => <UserInfoRow user={user} />
     },
     {
-      title: 'Ảnh Phòng',
-      dataIndex: 'products',
-      key: 'products',
+      title: 'Xen chi tiết vé',
       width: 100,
-      render: (item: any) => (
-        <img src={'/bus-bg.jpg'} className='object-cover w-20 h-20 rounded-lg cursor-pointer mb-1' alt='' />
+      render: (text: any, record: any) => (
+        <div style={{ textAlign: 'center' }}>
+          <TicketDetails TicketDetail={record.TicketDetail} />
+        </div>
       )
     },
     {
-      title: 'Số lượng',
+      title: 'Số lượng ghế',
       dataIndex: 'quantity',
       key: 'quantity',
       width: 91,
       render: (quantity: number) => <p className='text-center'>{quantity}</p>
+    },
+    {
+      title: 'Phương thức thanh toán',
+      dataIndex: 'paymentMethod',
+      key: 'paymentMethod',
+      width: 91,
+      render: (paymentMethod: string) => {
+        let displayText = ''
+        let textColor = ''
+
+        if (paymentMethod === 'OFFLINEPAYMENT') {
+          displayText = 'Tại bến'
+          textColor = 'text-green-500' // Màu xanh lá
+        } else if (paymentMethod === 'ZALOPAY') {
+          displayText = 'ZaloPay'
+          textColor = 'text-blue-500' // Màu xanh dương
+        } else {
+          displayText = paymentMethod // Nếu không phải 2 giá trị trên, hiển thị paymentMethod gốc
+          textColor = 'text-gray-700' // Màu mặc định
+        }
+
+        return <p className={`text-center ${textColor}`}>{displayText}</p>
+      }
     },
     {
       title: 'Tổng Tiền',
@@ -190,40 +226,106 @@ const ListCancelOrders = () => {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
-      width: 110,
-      render: () => (
-        <span className={`text-white capitalize font-semibold bg-meta-1 rounded inline-block px-2 py-1`}>Đã hủy</span>
+      width: 130,
+      render: (status: string, data: any) => (
+        <span
+          className={`text-white capitalize font-semibold bg-meta-6
+          rounded inline-block px-2 py-1`}
+        >
+          {data.payment !== 'cod' && status == 'pending' ? 'Thanh toán' : 'Chưa thanh toán'}
+        </span>
       )
-    },
-    {
-      title: 'Thời gian đặt vé',
-      dataIndex: 'timeOrder',
-      key: 'timeOrder',
-      width: 200,
-      sorter: (a, b) => a.timeOrder.localeCompare(b.timeOrder),
-      sortDirections: ['descend', 'ascend'],
-      render: (time: string) => <span className='capitalize'>{formatDate(time)}</span>
     },
 
     {
-      // title: <span className='block text-center'>Action</span>,
       key: 'action',
-      // fixed: 'right',
-      width: 100,
+      title: 'Xác nhận trạng thái vé',
+      width: 200,
       render: (_: any, order) => (
         <div className='flex items-center justify-center'>
-          <Space size='middle'>
-            {/* <Tooltip title='Xem chi tiết đơn hàng'>
+          <Space>
+            {/* <Tooltip title='Xem chi tiết vé'>
               <ButtonAnt
                 size='large'
-                className='bg-meta-5 hover:!text-white flex items-center justify-center text-white'
+                className='bg-meta-6 hover:!text-white flex items-center justify-center text-white'
                 icon={<EyeFilled />}
                 onClick={() => {
-                  // dispatch(setCategory({ _id: category._id, name: category.name }))
                   dispatch(setOpenDrawer(true))
                   dispatch(setOrderData({ ...order }))
                 }}
               />
+            </Tooltip> */}
+            <Tooltip title='Xác nhận vé'>
+              {/* <ButtonAnt
+                size='large'
+                className='bg-meta-5 hover:!text-white flex items-center justify-center text-white'
+                icon={<CheckOutlined />}
+                onClick={() => {
+                  onConfirmOrder({ idOrder: order.key, idUser: order.user_order })
+                }}
+              /> */}
+              <Form.Item style={{ width: 200 }} name='category'>
+                <Select
+                  onChange={(value) => {
+                    console.log(order, 'value')
+                    onConfirmOrder({
+                      idOrder: order.key,
+                      idUser: value
+                    })
+                  }}
+                  placeholder='Hành động'
+                  size='large'
+                >
+                  <Select.Option value={'PAID'}>
+                    <span style={{ color: '#0A5EB0', fontWeight: 500 }} className='text-sm capitalize'>
+                      Xác nhận thanh toán
+                    </span>
+                  </Select.Option>
+                  {/* <Select.Option value={'PAYMENT_FAILED'}>
+                    <span className='text-sm capitalize'>PAYMENT_FAILED</span>
+                  </Select.Option> */}
+                  {/* <Select.Option value={'CANCELED'}>
+                    <span className='text-sm capitalize'>Hủy vé</span>
+                  </Select.Option> */}
+                </Select>
+              </Form.Item>
+            </Tooltip>
+
+            {/* <Tooltip title='Hủy vé'>
+              {order && !order.user_order ? (
+                <Popconfirm
+                  title='Bạn muốn hủy vé này chứ ?'
+                  onConfirm={() => {
+                    cancelOrder({ id: order.key, reasonCancelOrder: 'hủy' })
+                      .unwrap()
+                      .then(() => {
+                        message.success(`Hủy vé thành công`)
+                      })
+                      .catch(() => {
+                        messageAlert('Hủy vé thất bại.Hãy thử lại! ', 'error', 5)
+                      })
+                    ClientSocket.cancelOrder(order.key)
+                  }}
+                  okText='Đồng ý'
+                  cancelText='Hủy'
+                >
+                  <ButtonAnt
+                    size='large'
+                    className='bg-meta-1 hover:!text-white flex items-center justify-center text-white'
+                    icon={<CloseCircleFilled />}
+                  />
+                </Popconfirm>
+              ) : (
+                <ButtonAnt
+                  size='large'
+                  className='bg-meta-1 hover:!text-white flex items-center justify-center text-white'
+                  icon={<CloseCircleFilled />}
+                  onClick={() => {
+                    dispatch(setOpenModal(true))
+                    dispatch(setIdOrderCancel(order.key))
+                  }}
+                />
+              )}
             </Tooltip> */}
           </Space>
         </div>
@@ -237,6 +339,7 @@ const ListCancelOrders = () => {
         username: item.user?.fullName,
         phone: item.user?.phoneNumber
       },
+      code: item?.code,
       payment: '',
       user_order: item?.user?._id,
       itm: item?.items,
@@ -247,7 +350,23 @@ const ListCancelOrders = () => {
       timeOrder: item.trip?.departureTime,
       key: item._id,
       index: index + 1,
-      orderCode: item._id.toUpperCase()
+      orderCode: item._id.toUpperCase(),
+      paymentMethod: item.paymentMethod,
+      TicketDetail: {
+        startProvince: item.busRoute.startProvince,
+        endProvince: item.busRoute.endProvince,
+        boardingPoint: item.boardingPoint,
+        dropOffPoint: item.dropOffPoint,
+        departureTime: item.trip.departureTime,
+        arrivalTime: item.trip.arrivalTime,
+        seatNumber: item.seatNumber,
+        createdAt: item.createdAt,
+        paymentMethod: item.paymentMethod,
+        customerPhone: item.customerPhone,
+        customerName: item.customerName,
+        note: item.note,
+        totalPrice: item?.totalAmount
+      }
     }))
   if (isLoading) return <Loading />
   if (isError) return <NotFound />

@@ -33,7 +33,7 @@ export interface IUser {
 }
 
 export interface ResIUser {
-  user: IUser
+  user: any
 }
 
 export interface IUserDataType {
@@ -46,7 +46,6 @@ export interface IUserDataType {
 }
 
 export enum IRoleUser {
-  ADMIN = 'admin',
-  CUSTOMER = 'customer',
-  STAFF = 'staff'
+  ADMIN = 'ADMIN',
+  STAFF = 'STAFF'
 }

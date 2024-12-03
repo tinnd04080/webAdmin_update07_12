@@ -11,13 +11,14 @@ import { cancelDelete } from '..'
 import { messageAlert } from '~/utils/messageAlert'
 import { pause } from '~/utils/pause'
 import { useAppSelector } from '~/store/hooks'
-
+import { useRef, useState } from 'react'
 // export const useRenderCategory = (isDeleted?: boolean) => {
 export const useRenderCategory = (categories: ICategory[], isDeleted?: boolean) => {
   const [deleteFakeCategory] = useDeleteFakeMutation()
   const [restoreCategory] = useRestoreCategoryMutation()
   const [deleteRealCategory] = useDeleteRealMutation()
-
+  const [searchText, setSearchText] = useState<string>('')
+  const [searchedColumn, setSearchedColumn] = useState<string>('')
   const dispatch = useAppDispatch()
 
   const { user } = useAppSelector((state: RootState) => state.persistedReducer.auth)
@@ -25,7 +26,7 @@ export const useRenderCategory = (categories: ICategory[], isDeleted?: boolean) 
   /* staff */
   const columnsStaff: ColumnsType<ICategory> = [
     {
-      title: 'Stt',
+      title: 'STT',
       dataIndex: 'index',
       key: 'index',
       width: 60,
@@ -51,24 +52,6 @@ export const useRenderCategory = (categories: ICategory[], isDeleted?: boolean) 
         )
       }
     },
-    /* {
-      title: 'Tình khởi hành',
-      dataIndex: 'startProvince',
-      key: 'startProvince',
-      filterSearch: true,
-      filters: categories?.map((item) => ({ text: item.startDistrict, value: item._id })),
-      onFilter: (value: any, record: ICategory) => record._id === value
-      // render: (name: string) => <span className='capitalize'>{name}</span>,
-    },
-    {
-      title: 'Điểm đến',
-      dataIndex: 'endProvince',
-      key: 'endProvince',
-      filterSearch: true,
-      filters: categories?.map((item) => ({ text: item.startDistrict, value: item._id })),
-      onFilter: (value: any, record: ICategory) => record._id === value
-      // render: (name: string) => <span className='capitalize'>{name}</span>,
-    }, */
     {
       title: 'Điểm lên xe',
       dataIndex: 'startDistrict', // Trường hiển thị tên tỉnh điểm đến
@@ -131,6 +114,11 @@ export const useRenderCategory = (categories: ICategory[], isDeleted?: boolean) 
     }
   ]
 
+  const handleSearch = (selectedKeys: string[], confirm: (param?: FilterConfirmProps) => void, dataIndex: IProduct) => {
+    confirm()
+    setSearchText(selectedKeys[0])
+    setSearchedColumn(dataIndex.name)
+  }
   /* admin */
   const handleDelete = async (id: string) => {
     await pause(2000)
@@ -159,10 +147,9 @@ export const useRenderCategory = (categories: ICategory[], isDeleted?: boolean) 
   const columnsAdmin: ColumnsType<ICategory> = [
     ...columnsStaff,
     {
-      // title: <span className='block text-center'>Action</span>,
+      title: <span className='block text-center'>Cập nhật</span>,
       key: 'action',
       width: 200,
-      // fixed: 'right',
       render: (_: string, category: ICategory) => {
         if (!isDeleted) {
           return (

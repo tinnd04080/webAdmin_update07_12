@@ -24,7 +24,10 @@ export const useRenderVoucher = () => {
   const [deleteVoucher] = useDeleteVoucherMutation()
 
   const { user } = useAppSelector((state: RootState) => state.persistedReducer.auth)
-
+  const [columns, setColumns] = useState<ColumnType<any>[]>([])
+  // Log user and user.role here
+  console.log('User:', user)
+  console.log('User Role:', user?.role)
   const handleSearch = (selectedKeys: string[], confirm: (param?: FilterConfirmProps) => void, dataIndex: IVoucher) => {
     confirm()
     setSearchText(selectedKeys[0])
@@ -105,7 +108,8 @@ export const useRenderVoucher = () => {
       title: 'STT',
       dataIndex: 'index',
       key: 'index',
-      width: 50
+      width: '6%',
+      align: 'center'
     },
     {
       title: 'Mã giảm giá',
@@ -113,6 +117,7 @@ export const useRenderVoucher = () => {
       key: 'code',
       width: '20%',
       render: (name: string) => <p className=''>{name}</p>,
+      align: 'center',
       ...getColumnSearchProps('code')
     },
 
@@ -121,21 +126,24 @@ export const useRenderVoucher = () => {
       dataIndex: 'discountAmount',
       key: 'discountAmount',
       width: '12%',
-      render: (discount: number) => `${discount}` + ' %'
+      render: (discount: number) => `${discount}` + ' %',
+      align: 'center'
     },
     {
       title: 'Số lượng mã được phát hành',
       dataIndex: 'quantity',
       key: 'quantity',
       width: '15%',
-      render: (quantity: string) => <p>{quantity} mã</p>
+      render: (quantity: string) => <p>{quantity} mã</p>,
+      align: 'center'
     },
     {
       title: 'Số lượng mã còn lại',
       dataIndex: 'remainingCount',
       key: 'remainingCount',
       width: '12%',
-      render: (remainingCount: string) => <p>{remainingCount} mã</p>
+      render: (remainingCount: string) => <p>{remainingCount} mã</p>,
+      align: 'center'
     },
     {
       title: 'Thời gian',
@@ -145,24 +153,18 @@ export const useRenderVoucher = () => {
         <span>
           Từ: {dayjs(data.startDate).format('DD-MM-YYYY')} <br /> Đến: {dayjs(data.endDate).format('DD-MM-YYYY')}
         </span>
-      )
+      ),
+      align: 'center'
     },
     {
       title: 'Mô tả ',
       dataIndex: 'description',
       key: 'description',
-      width: '25%',
+      width: '30%',
       render: (name: string) => <p className='uppercase'>{name}</p>,
+      align: 'center',
       ...getColumnSearchProps('description')
     },
-    /* {
-      title: 'Trạng thái',
-      dataIndex: 'status',
-      key: 'status',
-      width: '15%',
-      render: (status: string) => <p className='uppercase'>{status}</p>,
-      ...getColumnSearchProps('status')
-    } */
     {
       title: 'Trạng thái',
       dataIndex: 'status',
@@ -174,18 +176,18 @@ export const useRenderVoucher = () => {
             {status === 'EXPIRED' ? 'Hết hạng' : 'Đang hoạt động'}
           </Tag>
         </>
-      )
+      ),
+      align: 'center'
     }
   ]
-
   /* admin */
   const columnsAdmin = [
     ...columnsStaff,
 
     {
-      // title: <span className='block text-center'>Action</span>,
+      title: <span className='block text-center'>Cập nhật</span>,
       key: 'action',
-      width: 200,
+      width: 300,
       render: (_: any, voucher: IVoucher) => (
         <div className='flex items-center justify-center'>
           <Space size='middle'>
@@ -221,6 +223,8 @@ export const useRenderVoucher = () => {
       )
     }
   ]
-  // return user && user.role === IRoleUser.ADMIN ? columnsAdmin : columnsStaff/
-  return columnsAdmin
+  const columnsstaff = [...columnsStaff]
+
+  return user && user.role === IRoleUser.STAFF ? columnsstaff : columnsAdmin
+  // return columnsstaff
 }

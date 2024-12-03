@@ -240,7 +240,7 @@ const ListOrders = () => {
             <Button variant='success' icon={<IoCheckmarkDoneCircleSharp />} onClick={() => onDoneOrder(order.key)} />
           )}
 
-          {order.status === 'pending' && (
+          {order.status === 'PENDING' && (
             <Button
               variant='danger'
               icon={<CloseCircleFilled />}

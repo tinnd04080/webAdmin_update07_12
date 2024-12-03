@@ -45,7 +45,8 @@ const VoucherAdd = ({ open }: VoucherAddProps) => {
     voucherData && voucherData._id && setCheckedVoucher(voucherData.isActive)
   }, [voucherData])
 
-  const onFinish = async (values: IVoucher) => {
+  /* Nút cập nhật */
+  /*   const onFinish = async (values: IVoucher) => {
     if (voucherData._id) {
       updateVoucher({ _id: voucherData._id, ...values, isActive: checkedVoucher })
         .unwrap()
@@ -65,6 +66,25 @@ const VoucherAdd = ({ open }: VoucherAddProps) => {
         onClose()
       })
       .catch(() => messageAlert('Thêm voucher thất bại!', 'error'))
+  } */
+  const onFinish = async (values: IVoucher) => {
+    try {
+      if (voucherData._id) {
+        // Cập nhật voucher
+        await updateVoucher({ _id: voucherData._id, ...values, isActive: checkedVoucher }).unwrap()
+        messageAlert('Cập nhật thành công', 'success')
+        onClose()
+      } else {
+        // Thêm mới voucher
+        await addVoucher(values).unwrap()
+        messageAlert('Thêm voucher thành công', 'success')
+        onClose()
+      }
+    } catch (error: any) {
+      // Lấy thông báo lỗi từ backend và hiển thị
+      const errorMessage = error?.message || error?.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại!'
+      messageAlert(errorMessage, 'error')
+    }
   }
   const onClose = () => {
     dispatch(setOpenDrawer(false))

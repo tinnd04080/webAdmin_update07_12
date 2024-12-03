@@ -84,8 +84,8 @@ const ListVoucherActive = () => {
           //   defaultPageSize: 10,
           //   showSizeChanger: true
         }}
+        scroll={{ x: 'max-content', y: '50vh' }} // Cấu hình cuộn ngang
         rowSelection={user.role === IRoleUser.ADMIN ? rowSelection : undefined}
-        // scroll={{ y: '60vh' }}
         bordered
       />
     </div>

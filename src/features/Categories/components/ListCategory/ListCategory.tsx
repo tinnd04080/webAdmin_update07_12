@@ -93,7 +93,7 @@ const ListCategory = () => {
             },
             showQuickJumper: true
           }}
-          scroll={{ y: '50vh', x: 650 }}
+          scroll={{ y: '50vh', x: 'max-content' }} // chỉnh sửa cuộn ngang
           bordered
         />
       </div>
