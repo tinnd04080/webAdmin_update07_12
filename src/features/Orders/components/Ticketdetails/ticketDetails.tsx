@@ -95,7 +95,7 @@ const TicketDetails = ({ TicketDetail }: TicketDetail) => {
           </div>
 
           <div className='info-group'>
-            <p className='info-title'>Ghế đã chọn:</p>
+            <p className='info-title'>Vị trí ghế:</p>
             <p className='info-content'>{TicketDetail.seatNumber?.join(', ')}</p>
           </div>
 

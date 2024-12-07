@@ -31,6 +31,7 @@ const FeatureTrips = ({ data }: FeatureProductsProps) => {
     }
   }, [pathname])
   const isAdmin = user && user.role === IRoleUser.ADMIN
+  console.log('Có phải là admin:', isAdmin)
 
   return (
     <div>
@@ -54,7 +55,7 @@ const FeatureTrips = ({ data }: FeatureProductsProps) => {
         <ProductListActive checkPath={checkPath} />
       )}
 
-      {/* preview product */}
+      {/* Component Xem danh sách ghế xe */}
       <PreviewProduct />
     </div>
   )

@@ -1,8 +1,11 @@
-import { Button as ButtonAnt, Input, Space, Table, Tooltip, Form, Select } from 'antd'
-import { EyeFilled, SearchOutlined } from '@ant-design/icons'
+import { Button as ButtonAnt, Form, Input, Popconfirm, Select, Space, Table, Tooltip, message } from 'antd'
+import { CheckOutlined, CloseCircleFilled, EyeFilled, SearchOutlined } from '@ant-design/icons'
 import { RootState, useAppDispatch } from '~/store/store'
+import { setIdOrderCancel, setOrderData } from '~/store/slices/Orders/order.slice'
+import { useCancelOrderMutation, useConfirmOrderMutation, useGetAllOrderPendingQuery } from '~/store/services/Orders'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { messageAlert } from '~/utils/messageAlert'
+
+import { Button } from '~/components'
 import { ColumnType } from 'antd/lib/table'
 import { ColumnsType } from 'antd/es/table'
 import type { FilterConfirmProps } from 'antd/es/table/interface'
@@ -12,21 +15,21 @@ import type { InputRef } from 'antd'
 import Loading from '~/components/Loading/Loading'
 import { NotFound } from '~/pages'
 import TableChildrend from '~/features/Products/utils/TableChildrend'
-import UserInfoRow from '../UserInfoRow/UserInfoRow'
+import UserInfoRow from '../UserInfoRow/UserInfoRow.tsx'
+import TicketDetails from '../Ticketdetails/ticketDetails.tsx'
 import { formatCurrency } from '~/utils'
 import { formatDate } from '~/utils/formatDate'
+import { messageAlert } from '~/utils/messageAlert'
 import { setOpenDrawer } from '~/store/slices'
-import { setOrderData } from '~/store/slices/Orders/order.slice'
+import { setOpenModal } from '~/store/slices/Modal'
 import { useAppSelector } from '~/store/hooks'
-import { useGetAllOrderCancelQuery, useGetAllOrderPendingQuery, useConfirmOrderMutation } from '~/store/services/Orders'
-import TicketDetails from '../Ticketdetails/ticketDetails.tsx'
+
 type DataIndex = keyof IOrderDataType
-const ListCancelOrders = () => {
+const ListPending = () => {
   const dispatch = useAppDispatch()
-  const [cancelOrder, setCancelOrder] = useState<any>()
+  const [pendingOrder, setPendingOrder] = useState<any>()
   const { orderDate } = useAppSelector((state) => state.orders)
   const { user } = useAppSelector((state: RootState) => state.persistedReducer.auth)
-
   const [options, setoptions] = useState({
     page: 1,
     limit: 10,
@@ -43,25 +46,13 @@ const ListCancelOrders = () => {
       endDate: orderDate.endDate
     }))
   }, [orderDate])
-
-  const { data: dataTrip, isLoading, isError } = useGetAllOrderPendingQuery(options)
+  const [cancelOrder, { isLoading: isCanceling }] = useCancelOrderMutation()
 
   /*Search */
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
-  const [confirmOrder, { isLoading: isComfirming }] = useConfirmOrderMutation()
-  const onConfirmOrder = ({ idOrder, idUser }: { idOrder: string; idUser: string }) => {
-    confirmOrder({
-      idOrder,
-      idUser
-    })
-      .unwrap()
-      .then(() => {
-        messageAlert('Thay đổi trạng thái thành công', 'success', 4)
-      })
-      .catch(() => messageAlert('Thay đổi trạng thái thất bại', 'error'))
-  }
+
   const handleSearch = (
     selectedKeys: string[],
     confirm: (param?: FilterConfirmProps) => void,
@@ -130,7 +121,7 @@ const ListCancelOrders = () => {
     render: (text) =>
       searchedColumn === dataIndex ? (
         <Highlighter
-          highlightStyle={{ backgroundColor: '#ffc069', padding: 0, margin: '0 auto', textAlign: 'center' }}
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
           searchWords={[searchText]}
           autoEscape
           textToHighlight={text ? text.toString().substring(text.length - 8) : ''}
@@ -140,6 +131,42 @@ const ListCancelOrders = () => {
       )
   })
   /*End Search */
+
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
+  const [confirmOrder, { isLoading: isComfirming }] = useConfirmOrderMutation()
+  const onConfirmOrder = ({ idOrder, idUser }: { idOrder: string; idUser: string }) => {
+    confirmOrder({
+      idOrder,
+      idUser
+    })
+      .unwrap()
+      .then(() => {
+        messageAlert('Thay đổi trạng thái thành công', 'success', 4)
+      })
+      .catch(() => messageAlert('Thay đổi trạng thái thất bại', 'error'))
+  }
+
+  const onConfirmOrderMany = () => {
+    selectedRowKeys.forEach((selectItem) => {
+      confirmOrder(selectItem as string)
+        .unwrap()
+        .then(({ order }) => {
+          messageAlert('Thay đổi trạng thái thành công', 'success', 4)
+        })
+        .catch(() => messageAlert('Thay đổi trạng thái thất bại', 'error'))
+    })
+    setSelectedRowKeys([])
+  }
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    setSelectedRowKeys(newSelectedRowKeys)
+  }
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange
+  }
+  const hasSelected = selectedRowKeys.length > 2
+
+  const { data: dataTrip, isLoading, isError } = useGetAllOrderPendingQuery(options)
 
   const columns: ColumnsType<any> = [
     // {
@@ -200,6 +227,9 @@ const ListCancelOrders = () => {
         } else if (paymentMethod === 'ZALOPAY') {
           displayText = 'ZaloPay'
           textColor = 'text-blue-500' // Màu xanh dương
+        } else if (paymentMethod === 'PENDING') {
+          displayText = 'Chờ khách hàng xử lý'
+          textColor = 'text-blue-500' // Màu xanh dương
         } else {
           displayText = paymentMethod // Nếu không phải 2 giá trị trên, hiển thị paymentMethod gốc
           textColor = 'text-gray-700' // Màu mặc định
@@ -232,13 +262,49 @@ const ListCancelOrders = () => {
           className={`text-white capitalize font-semibold bg-meta-6
           rounded inline-block px-2 py-1`}
         >
-          {data.payment !== 'cod' && status == 'CANCELED' ? 'Vé bị hủy' : 'Chưa thanh toán'}
+          {data.payment !== 'cod' && status == 'PENDING' ? 'Chờ xác nhận thanh toán' : 'Chưa thanh toán'}
         </span>
       )
     }
   ]
+  if (isLoading) return <Loading />
+  if (isError) return <NotFound />
+  // const ordersData = dataTrip?.data
+  //   ?.filter((itc: any) => itc.status == 'PENDING')
+  //   ?.map((item: any, index: number) => ({
+  //     user: {
+  //       username: item.user?.fullName,
+  //       phone: item.user?.phoneNumber
+  //     },
+  //     payment: '',
+  //     user_order: item?.user?._id,
+  //     itm: item?.items,
+  //     quantity: item.seatNumber.length,
+  //     totalPrice: item?.totalAmount,
+  //     status: item.status,
+  //     moneyPromotion: item.moneyPromotion,
+  //     timeOrder: item.trip?.departureTime,
+  //     key: item._id,
+  //     index: index + 1,
+  //     orderCode: item._id.toUpperCase(),
+  //     TicketDetail: {
+  //       /* Tuyến */
+  //       startProvince: item.trip.startProvince,
+  //       endProvince: item.trip.endProvince,
+  //       /* Điểm xuất phát */
+  //       boardingPoint: item.boardingPoint,
+  //       dropOffPoint: item.dropOffPoint,
+  //       /* Thông tin thời gian */
+  //       departureTime: item.trip.departureTime,
+  //       arrivalTime: item.trip.arrivalTime,
+  //       /* Vị trí ghế */
+  //       seatNumber: item.seatNumber,
+  //       /* Ngày tạo vé */
+  //       createdAt: item.createdAt
+  //     }
+  //   }))
   const ordersData = dataTrip?.data
-    ?.filter((itc: any) => itc.status == 'CANCELED')
+    ?.filter((itc: any) => itc.status === 'PENDING' || itc.status === 'PENDING')
     ?.map((item: any, index: number) => ({
       user: {
         username: item.user?.fullName,
@@ -273,30 +339,46 @@ const ListCancelOrders = () => {
         totalPrice: item?.totalAmount
       }
     }))
-  if (isLoading) return <Loading />
-  if (isError) return <NotFound />
+
   return (
-    <div className='dark:bg-graydark'>
-      <Table
-        columns={columns}
-        dataSource={ordersData}
-        // expandable={{
-        //   expandedRowRender: TableChildrend
-        // }}
-        pagination={{
-          pageSize: cancelOrder && cancelOrder.limit,
-          showSizeChanger: true,
-          pageSizeOptions: ['10', '15', '20', '25'],
-          total: cancelOrder && cancelOrder?.totalDocs,
-          onChange(page, pageSize) {
-            setoptions((prev) => ({ ...prev, page, limit: pageSize }))
-          }
-        }}
-        scroll={{ y: '50vh', x: 1000 }}
-        bordered
-      />
-    </div>
+    <>
+      {(isComfirming || isCanceling) && <Loading overlay />}
+      {hasSelected && (
+        <Space>
+          <Popconfirm
+            title='Bạn muốn xác nhận tất cả vé này?'
+            onConfirm={onConfirmOrderMany}
+            onCancel={() => setSelectedRowKeys([])}
+          >
+            <Button styleClass='mb-4'>Xác nhận tất cả</Button>
+          </Popconfirm>
+        </Space>
+      )}
+      {/* <>{JSON.stringify(pendingOrder)}</> */}
+
+      <div className='dark:bg-graydark w-full overflow-x-auto'>
+        <Table
+          columns={columns}
+          // expandable={{
+          //   expandedRowRender: TableChildrend
+          // }}
+          dataSource={ordersData}
+          pagination={{
+            pageSize: pendingOrder && pendingOrder.limit,
+            showSizeChanger: true,
+            pageSizeOptions: ['10', '15', '20', '25'],
+            total: pendingOrder && pendingOrder?.totalDocs,
+            onChange(page, pageSize) {
+              setoptions((prev) => ({ ...prev, page, limit: pageSize }))
+            }
+          }}
+          scroll={{ y: '50vh', x: 'max-content' }}
+          bordered
+          rowSelection={rowSelection}
+        />
+      </div>
+    </>
   )
 }
 
-export default ListCancelOrders
+export default ListPending

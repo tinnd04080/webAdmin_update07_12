@@ -43,8 +43,8 @@ export const items: MenuProps['items'] = [
   getItem('Quản lý', 'manager', <AiOutlineControl />, [
     getItem(<NavLink to={`/manager/products`}> Xe</NavLink>, 'products', <FaBusAlt />),
     getItem(<NavLink to={`/manager/categories`}>Tuyến đường</NavLink>, 'categories', <FaRoute />),
-    getItem(<NavLink to={`/manager/trips`}> Chuyến xe </NavLink>, 'trips', <FaMapMarkedAlt />),
-    // getItem(<NavLink to={`/manager/sizes`}>Ghế xe</NavLink>, 'sizes', <AiOutlineFontSize />),
+    getItem(<NavLink to={`/manager/trips`}> Chuyến xe</NavLink>, 'trips', <FaMapMarkedAlt />),
+    /* getItem(<NavLink to={`/manager/sizes`}>Ghế xe</NavLink>, 'sizes', <AiOutlineFontSize />), */
     getItem(<NavLink to={`/manager/vouchers`}>Mã giảm giá</NavLink>, 'vouchers', <IoTicket />)
   ]),
   // quản lý người dùng

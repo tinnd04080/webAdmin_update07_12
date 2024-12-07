@@ -41,7 +41,7 @@ const ListConfirmOrders = () => {
 
   const [options, setoptions] = useState({
     page: 1,
-    limit: 10,
+    limit: 100,
     startDate: '',
     endDate: '',
     room: user._id
@@ -61,7 +61,6 @@ const ListConfirmOrders = () => {
   const [searchedColumn, setSearchedColumn] = useState('')
   const [confirmOrder, { isLoading: isComfirming }] = useConfirmOrderMutation()
   const searchInput = useRef<InputRef>(null)
-
   const onConfirmOrder = ({ idOrder, idUser }: { idOrder: string; idUser: string }) => {
     confirmOrder({
       idOrder,
@@ -275,7 +274,7 @@ const ListConfirmOrders = () => {
           className={`text-white capitalize font-semibold bg-meta-6
           rounded inline-block px-2 py-1`}
         >
-          {data.payment !== 'cod' && status == 'pending' ? 'Thanh toán' : 'Chưa thanh toán'}
+          {data.payment !== 'cod' && status == 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán'}
         </span>
       )
     },
@@ -408,7 +407,8 @@ const ListConfirmOrders = () => {
         customerPhone: item.customerPhone,
         customerName: item.customerName,
         note: item.note,
-        totalPrice: item?.totalAmount
+        totalPrice: item?.totalAmount,
+        invoiceCode: item?.invoiceCode
       }
     }))
 

@@ -287,7 +287,7 @@ const ListPendingOrders = () => {
             </Tooltip> */}
             <Tooltip title='Xác nhận vé'>
               {/* <ButtonAnt
-                size='large'
+                size='large'F
                 className='bg-meta-5 hover:!text-white flex items-center justify-center text-white'
                 icon={<CheckOutlined />}
                 onClick={() => {
@@ -401,7 +401,7 @@ const ListPendingOrders = () => {
   //     }
   //   }))
   const ordersData = dataTrip?.data
-    ?.filter((itc: any) => itc.status === 'PAYMENTPENDING' || itc.status === 'PENDING')
+    ?.filter((itc: any) => itc.status === 'PAYMENTPENDING' || itc.status === 'PAYMENTPENDING')
     ?.map((item: any, index: number) => ({
       user: {
         username: item.user?.fullName,

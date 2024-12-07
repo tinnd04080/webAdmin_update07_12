@@ -24,7 +24,7 @@ export const ProductListActive = ({ checkPath }: any) => {
     _limit: 10,
     query: ''
   })
-  console.log(dataProducts,'data')
+  console.log(dataProducts, 'data')
   const products = dataProducts?.data?.map((product: any, index: number) => ({
     ...product,
     key: product._id,
@@ -50,7 +50,7 @@ export const ProductListActive = ({ checkPath }: any) => {
   }
   const hasSelected = selectedRowKeys.length > 1
 
-  const columnsData = useRender(dataProducts?.data || [] ,false, checkPath)
+  const columnsData = useRender(dataProducts?.data || [], false, checkPath)
 
   return (
     <div>
@@ -84,6 +84,7 @@ export const ProductListActive = ({ checkPath }: any) => {
           Xuất excel
         </ButtonAntd> */}
       </div>
+      {/* Hiển thị bảng quản lý */}
       <Table
         rowSelection={user.role === IRoleUser.ADMIN ? rowSelection : undefined}
         columns={columnsData}

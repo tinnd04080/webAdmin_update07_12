@@ -13,12 +13,12 @@ export const items: TabsProps['items'] = [
     key: uuidv4(),
     label: 'Các Xe đang hoạt động',
     children: <ProductListActive />
-  },
-  {
+  }
+  /* {
     key: uuidv4(),
     label: 'Các Xe đã ẩn',
     children: <ProductListInActive />
-  }
+  } */
   // {
   //   key: uuidv4(),
   //   label: 'Các khách sạn đã xóa',

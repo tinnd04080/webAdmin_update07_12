@@ -46,6 +46,6 @@ export interface IUserDataType {
 }
 
 export enum IRoleUser {
-  ADMIN = 'ADMIN',
-  STAFF = 'STAFF'
+  ADMIN = 'admin',
+  STAFF = 'staff'
 }

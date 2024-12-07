@@ -31,7 +31,7 @@ const FormProduct = () => {
   })
   const [productEdit, setProductEdit] = useState<IProduct | null>(null)
   const { productId } = useAppSelector((state) => state.products)
-  const [createProduct, { isLoading: isCreateLoading }] = useCreateTripsMutation()
+  const [createTrips, { isLoading: isCreateLoading }] = useCreateTripsMutation()
   const { productsList } = useAppSelector((state: RootState) => state.products)
   const [editProduct, { isLoading: isUpdating }] = useEditTripsMutation()
   const {
@@ -82,7 +82,7 @@ const FormProduct = () => {
 
     // Nếu không có productId và productEdit, thì thực hiện tạo mới
     try {
-      const response = await createProduct({ ...values }).unwrap()
+      const response = await createTrips({ ...values }).unwrap()
       if (response.message === 'success' || response.message === 'succes') {
         message.success('Thêm Chuyến xe thành công!')
       }
